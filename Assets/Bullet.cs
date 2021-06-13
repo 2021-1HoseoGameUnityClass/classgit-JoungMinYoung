@@ -27,7 +27,7 @@ public class Bullet : MonoBehaviour
     public void InstantiateBullet(float _direction)
     {
         direction = _direction;
-        Vector3 vector3 = new Vector3(_direction, 1, 1);
+        Vector3 vector3 = new Vector3(direction, 1, 1);
         transform.localScale = vector3;
         
         Destroy(this.gameObject, 2f);

@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject bulletobj = null;
 
+    private bool move = false;
+    private float moveHorizonral = 0;
+
     void Start()
     {
         
@@ -26,7 +29,10 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move();
+        if (move == true)
+        {
+            Move();
+        }
 
         if(Input.GetButtonDown("Jump"))
         {
@@ -41,7 +47,8 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        float h = Input.GetAxis("Horizontal");
+        //float h = Input.GetAxis("Horizontal");
+        float h = moveHorizonral;
         float playerSpeed = h * moveSpeed * Time.deltaTime;
         Vector3 vector3 = new Vector3();
         vector3.x = playerSpeed;
@@ -86,8 +93,44 @@ public class Player : MonoBehaviour
 
     private void Fire()
     {
-        float direction = transform.localScale.x;
+        AudioClip audioClip = Resources.Load<AudioClip>("RangedAttack") as AudioClip;
+        GetComponent<AudioSource>().clip = audioClip;
+        GetComponent<AudioSource>().Play();
+        float direction = transform.localPosition.x;
         Quaternion quaternion = new Quaternion(0, 0, 0, 0);
         Instantiate(bulletobj, bulletPos.transform.position, quaternion).GetComponent<Bullet>().InstantiateBullet(direction);
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.collider.tag == "Enemy")
+        {
+            DataManager.instance.playerHP -= 1;
+            if(DataManager.instance.playerHP < 0)
+            {
+                DataManager.instance.playerHP = 0;
+            }
+            UIManager.instance.PlayerHP();
+        }
+    }
+
+    public void OnMove(bool _right)
+    {
+        if(_right)
+        {
+            moveHorizonral = 1;
+        }
+        else
+        {
+            moveHorizonral = -1;
+        }
+
+        move = true;
+    }
+
+    public void OffMove()
+    {
+        moveHorizonral = 0;
+        move = false;
     }
 }
